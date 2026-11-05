@@ -19,7 +19,7 @@ package ohos.file.fs
 
 import ohos.business_exception.BusinessException
 import ohos.ffi.{RemoteDataLite, CArrString, RetDataCString, RetDataI64,
-    releaseFFIData, SUCCESS_CODE, toArrayCString, freeArrCString, safeMalloc}
+    releaseFFIData, SUCCESS_CODE, toArrayCString, freeArrCString, safeMalloc, Callback1Param}
 import ohos.hilog.HilogChannel
 import ohos.labels.APILevel
 
@@ -296,6 +296,15 @@ struct RetReaderIteratorResult {
         let code: Int32,
         let done: Bool,
         let value: CString
+    ) {}
+}
+
+@C
+struct CWatchEvent {
+    CWatchEvent(
+        let fileName: CString,
+        let event: UInt32,
+        let cookie: UInt32
     ) {}
 }
 
@@ -1888,6 +1897,53 @@ public class FileIo {
             throw BusinessException(cValue.code, getErrorInfo(cValue.code))
         }
         RandomAccessFile(cValue.data)
+    }
+
+    /**
+     * Creates a **Watcher** object to listen for file or directory changes.
+     *
+     * @param { String } path - Application sandbox path of the file or directory to observe.
+     * @param { UInt32 } events - Events to observe. Multiple events can be separated by vertical bars.
+     * @param { WatchEventListener } listener - Callback invoked when an observed event occurs. The callback will be
+     *     invoked each time an observed event occurs.
+     * @returns { Watcher } **Watcher** object created.
+     * @throws { BusinessException } 13900002 - No such file or directory
+     * @throws { BusinessException } 13900008 - Bad file descriptor
+     * @throws { BusinessException } 13900011 - Out of memory
+     * @throws { BusinessException } 13900012 - Permission denied
+     * @throws { BusinessException } 13900013 - Bad address
+     * @throws { BusinessException } 13900015 - File exists
+     * @throws { BusinessException } 13900018 - Not a directory
+     * @throws { BusinessException } 13900020 - Invalid argument
+     * @throws { BusinessException } 13900021 - File table overflow
+     * @throws { BusinessException } 13900022 - Too many open files
+     * @throws { BusinessException } 13900025 - No space left on device
+     * @throws { BusinessException } 13900030 - File name too long
+     * @throws { BusinessException } 13900042 - Unknown error
+     */
+    @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO",
+        throwexception: true
+    ]
+    public static func createWatcher(path: String, events: UInt32, listener: WatchEventListener): Watcher {
+        unsafe {
+            let cPath = LibC.mallocCString(path)
+            let wrapper = {
+                event: CWatchEvent =>
+                    // The native side releases fileName after the callback returns, so copy it to a String here.
+                    let fileName = event.fileName.toString()
+                    listener.callback_(WatchEvent(fileName, event.event, event.cookie))
+            }
+            let lambdaData = Callback1Param<CWatchEvent, Unit>(wrapper)
+            let cValue = FfiOHOSFileFsCreateWatcher(cPath, events, lambdaData.getID())
+            LibC.free(cPath)
+            if (cValue.code != SUCCESS_CODE) {
+                FS_LOG.error(getErrorInfo(cValue.code))
+                throw BusinessException(cValue.code, getErrorInfo(cValue.code))
+            }
+            return Watcher(cValue.data)
+        }
     }
 
     /**
