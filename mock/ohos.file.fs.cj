@@ -689,6 +689,15 @@ public class FileIo {
     }
 
     @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO",
+        throwexception: true
+    ]
+    public static func createWatcher(path: String, events: UInt32, listener: WatchEventListener): Watcher {
+        return Watcher()
+    }
+
+    @!APILevel[
         since: "22",
         syscap: "SystemCapability.FileManagement.File.FileIO",
         throwexception: true
@@ -1520,7 +1529,97 @@ public class Stream {
     public func read(buffer: Array<Byte>, options!: ReadOptions = ReadOptions()): Int64 {
         return 0
     }
-    
+
+    public init() {
+        super()
+    }
+}
+
+@!APILevel[
+    since: "26.1.0",
+    syscap: "SystemCapability.FileManagement.File.FileIO"
+]
+public class WatchEventListener {
+    @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO"
+    ]
+    public init(callback: (WatchEvent) -> Unit) {
+        super()
+    }
+}
+
+@!APILevel[
+    since: "26.1.0",
+    syscap: "SystemCapability.FileManagement.File.FileIO"
+]
+public class WatchEvent {
+    @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO"
+    ]
+    public prop fileName: String {
+        get() {
+            return String()
+        }
+    }
+
+    @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO"
+    ]
+    public prop event: UInt32 {
+        get() {
+            return 0
+        }
+    }
+
+    @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO"
+    ]
+    public prop cookie: UInt32 {
+        get() {
+            return 0
+        }
+    }
+
+    @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO"
+    ]
+    public init(
+        fileName: String,
+        event: UInt32,
+        cookie: UInt32
+    ) {
+        super()
+    }
+}
+
+@!APILevel[
+    since: "26.1.0",
+    syscap: "SystemCapability.FileManagement.File.FileIO"
+]
+public class Watcher {
+    @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO",
+        throwexception: true
+    ]
+    public func start(): Unit {
+        return ()
+    }
+
+    @!APILevel[
+        since: "26.1.0",
+        syscap: "SystemCapability.FileManagement.File.FileIO",
+        throwexception: true
+    ]
+    public func stop(): Unit {
+        return ()
+    }
+
     public init() {
         super()
     }

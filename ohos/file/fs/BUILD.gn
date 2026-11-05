@@ -33,6 +33,7 @@ ohos_cangjie_shared_library("ohos.file.fs") {
       "random_access_file.cj",
       "stat.cj",
       "stream.cj",
+      "watcher.cj",
     ]
   }
 

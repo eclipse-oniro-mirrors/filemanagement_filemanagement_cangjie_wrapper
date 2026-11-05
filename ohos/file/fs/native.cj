@@ -176,4 +176,10 @@ foreign {
     func FfiOHOSFileFsUtimes(path: CString, mtime: Float64): Int32
 
     func FfiOHOSFileFsReleaseCString(str: CString): Unit
+
+    func FfiOHOSFileFsCreateWatcher(path: CString, events: UInt32, funcId: Int64): RetDataI64
+
+    func FfiOHOSFileFsWatcherStart(id: Int64): Int32
+
+    func FfiOHOSFileFsWatcherStop(id: Int64): Int32
 }
